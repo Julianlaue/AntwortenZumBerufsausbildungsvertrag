@@ -3,9 +3,11 @@ import torch
 
 from src.model_download.falcon_downloader import start_download
 
+
 @click.group()
 def cli():
     pass
+
 
 @cli.command()
 @click.option("--version",
@@ -15,13 +17,14 @@ def cli():
 @click.option("--path",
               required=True,
               help="A path to the directory where the model files will be saved")
-def download(model_version: str, path:str):
-    """Starts downloading a falcon model from Huggingface. https://huggingface.co/tiiuae"""
-    print('in cli download')
-    start_download(model_version, path)
+def download(version: str, path:str):
+    """
+    Starts downloading a falcon model from Huggingface: https://huggingface.co/tiiuae
+    Example use on Neumann:  srun --gpus=1 --mem=32 python cli.py download --version=7b-inst --path=/home/julian.laue/models/falcon/falcon7b-inst
+    """
+    start_download(version, path)
 
 if __name__ == '__main__':
     # Entrypoint for the training
     torch.set_printoptions(precision=None, threshold=None, edgeitems=None, linewidth=None, profile=None, sci_mode=False)
-    print('in main')
     cli()

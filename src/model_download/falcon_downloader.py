@@ -34,7 +34,6 @@ def validate_directory(directory: str):
 
 
 def start_download(user_input_model_version: str, path: str):
-    print('in download')
     model_name = parse_version(user_input_model_version)
 
     validate_directory(path)
