@@ -2,7 +2,7 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 
-from langchain.chains import RetrievalQA
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
@@ -31,10 +31,19 @@ db = Chroma.from_documents(texts, embeddings)
 retriever = db.as_retriever(search_type="similarity", search_kwargs={"k":1})
 
 # create a chain to answer questions
-qa = RetrievalQA.from_chain_type(
-    llm=OpenAI(), chain_type="stuff", retriever=retriever, return_source_documents=True)
+qa = ConversationalRetrievalChain.from_llm(
+    llm=OpenAI(), chain_type="stuff", retriever=retriever, return_source_documents=False)
 
-query = 'Wo finde ich die Betriebsnummer der Handwerkskammer?'
-result = qa({"query": query})
-print(result)
+chat_history = []
+cont = True
+while cont:
+    query = input('Ihre Frage: ')
+    result = qa({'question': query, 'chat_history': chat_history})
+    print('Antwort: ' + result['answer'])
+    chat_history.append((query, result['answer']))
+
+    cont_s = input("Haben Sie noch eine Frage? (y/n)")
+    if cont_s == 'n':
+        cont = False
+
 
