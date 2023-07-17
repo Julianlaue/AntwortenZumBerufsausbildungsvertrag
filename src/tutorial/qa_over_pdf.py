@@ -8,11 +8,14 @@ from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 import streamlit as st
+import json
 
 import os
 
+
 def clear_submit():
     st.session_state["submit"] = False
+
 
 # set up a function for the introduction page
 def intro_page():
@@ -37,12 +40,15 @@ def app_page():
     # set openAI API key
     #os.environ["OPENAI_API_KEY"] = "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"
 
+    st.session_state["number"] = 0
+
     # load the document
     loader = PyPDFLoader('../../data/HandwerkskammerBotInfo.pdf')
+    historyjson = '../../data/history.json'
     faq = loader.load()
 
     # split the documents into chunks
-    text_splitter = CharacterTextSplitter(chunk_size=400, chunk_overlap=50)
+    text_splitter = TokenTextSplitter(chunk_size=1000, chunk_overlap=100)
     texts = text_splitter.split_documents(faq)
 
     # select which embeddings we want to use
@@ -56,9 +62,12 @@ def app_page():
 
     # create a chain to answer questions
     qa = ConversationalRetrievalChain.from_llm(
-        llm=OpenAI(model_name='gpt-4'), chain_type="stuff", retriever=retriever, return_source_documents=False)
+        llm=OpenAI(model_name='gpt-3.5-turbo'), chain_type="stuff", retriever=retriever, return_source_documents=False)
 
-    chat_history = []
+    # If there's no chat history in the session state yet, create a new list
+    st.session_state["chat_history"] = []
+    chat_history = [] 
+
     cont = True
 
     st.set_page_config(page_title="HandwerksGPT", page_icon="🔧", layout="wide")
@@ -69,24 +78,44 @@ def app_page():
 
     button = st.button("Submit")
 
-    if button or st.session_state.get("submit"):
+    if button:
         st.session_state["submit"] = True
         # Output Columns
         answer_col = st.columns(1)
         try:
+            # Load chat history from JSON file if it exists
+            if os.path.exists(historyjson):
+                with open(historyjson, 'r') as f:
+                    chat_history = [tuple(item) for item in json.load(f)]
+            else:
+                chat_history = []
+            # Get the answer from GPT-4
             answer = qa({'question': query, 'chat_history': chat_history})
 
-            st.markdown("#### Answer")
-            st.markdown(answer["answer"])
+            # Append the user's question and GPT-4's answer to the chat history
+            chat_history.append((query, answer["answer"]))
+
+            # Save chat history to JSON file
+            with open(historyjson, 'w') as f:
+                json.dump(chat_history, f)
+
+                # Display the chat history
+                for i in range(0, len(chat_history)):
+                    st.markdown(f"**Frage:** {chat_history[i][0]}")
+                    st.markdown(f"**Antwort:** {chat_history[i][1]}")
+            st.session_state["number"] = st.session_state["number"] + 1
+            print(st.session_state['number'])
 
         except OpenAIError as e:
             st.error(e._message)
 
-# Include your original app code here
-# ...
-
 # main
 def main():
+    if "started" not in st.session_state:
+        st.session_state['started'] = True
+        historyjson = '../../data/history.json'
+        if os.path.isfile(historyjson):
+            os.remove(historyjson)
     # initialize the session state variables
     if "OPENAI_API_KEY" not in st.session_state:
         st.session_state["OPENAI_API_KEY"] = ""
