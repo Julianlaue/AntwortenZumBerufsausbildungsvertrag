@@ -45,7 +45,7 @@ def app_page():
     print(os.getcwd())
 
     # load the document
-    loader = PyPDFLoader('../data/HandwerkskammerBotInfo.pdf')
+    loader = PyPDFLoader('/data/HandwerkskammerBotInfo.pdf')
     historyjson = '../data/history.json'
     faq = loader.load()
 
