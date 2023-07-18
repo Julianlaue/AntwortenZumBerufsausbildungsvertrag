@@ -45,8 +45,8 @@ def app_page():
     print(os.getcwd())
 
     # load the document
-    loader = PyPDFLoader('src/HandwerkskammerBotInfo.pdf')
-    historyjson = '../data/history.json'
+    loader = PyPDFLoader('data/HandwerkskammerBotInfo.pdf')
+    historyjson = 'data/history.json'
     faq = loader.load()
 
     # split the documents into chunks
@@ -146,7 +146,7 @@ def main():
     # Check if the history file has been created or whether this is a new session
     if "started" not in st.session_state:
         st.session_state['started'] = True
-        historyjson = '../data/history.json'
+        historyjson = 'data/history.json'
         if os.path.isfile(historyjson):
             os.remove(historyjson)
 
