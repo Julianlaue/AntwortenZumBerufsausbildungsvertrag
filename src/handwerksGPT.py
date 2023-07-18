@@ -42,6 +42,7 @@ def app_page():
     #os.environ["OPENAI_API_KEY"] = "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"
 
     st.session_state["number"] = 0
+    print(os.getcwd())
 
     # load the document
     loader = PyPDFLoader('../data/HandwerkskammerBotInfo.pdf')
