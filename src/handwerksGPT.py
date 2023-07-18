@@ -45,7 +45,7 @@ def app_page():
     print(os.getcwd())
 
     # load the document
-    loader = PyPDFLoader('julianlaue/antwortenzumberufsausbildungsvertrag/main/data/HandwerkskammerBotInfo.pdf')
+    loader = PyPDFLoader('HandwerkskammerBotInfo.pdf')
     historyjson = '../data/history.json'
     faq = loader.load()
 
