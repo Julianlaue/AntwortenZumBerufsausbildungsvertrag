@@ -39,7 +39,6 @@ def intro_page():
 # set up a function for the app page
 def app_page():
     # set openAI API key
-    #os.environ["OPENAI_API_KEY"] = "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"
 
     st.session_state["number"] = 0
     print(os.getcwd())
