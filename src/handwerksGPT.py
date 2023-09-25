@@ -72,12 +72,13 @@ def app_page():
     Standalone question:"""
     CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
 
-    prompt_template = """Du bist eine freundliche, hilfreiche KI, die Fragen zum Berufsausbildungsvertrag beantwortet. Dein Name ist HandwerksGPT. Benutze den folgenden Kontext, um die Frage am Ende zu beantworten.
-    Wenn du die Antwort anhand des Kontext nicht beantworten kannst sag, dass du die Frage nicht beantworten kannst, erfinde keine Antworten. 
+    prompt_template = """Du bist eine freundliche, hilfreiche KI, die Fragen zum Berufsausbildungsvertrag beantwortet. Dein Name ist HandwerksGPT. In deinen Antworten sprichst du den Nutzer immer mit 'Sie' an. Benutze den folgenden Kontext, um die Frage am Ende zu beantworten.
 
     Kontext: {context}
 
     Frage: {question}
+    Wenn du die Antwort anhand des Kontext nicht beantworten kannst sag: 'Für Ihre Frage liegt keine passende Antwort vor, bitte wenden Sie sich hierzu an die Ausbildungsberatung Ihrer Handwerkskammer'. Erfinde keine Antworten. 
+
     Hilfreiche Antwort:"""
     QA_PROMPT = PromptTemplate(
         template=prompt_template, input_variables=["context", "question"])
@@ -86,7 +87,7 @@ def app_page():
     llm = OpenAI(
         model_name='gpt-3.5-turbo',
         temperature=0.1,
-        max_tokens=1000
+        max_tokens=2000
     )
 
     # create a chain to answer questions
