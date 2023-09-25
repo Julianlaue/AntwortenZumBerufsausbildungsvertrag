@@ -49,7 +49,7 @@ def app_page():
     faq = loader.load()
 
     # split the documents into chunks
-    text_splitter = TokenTextSplitter(chunk_size=3000, chunk_overlap=400)
+    text_splitter = TokenTextSplitter(chunk_size=6000, chunk_overlap=1000)
     texts = text_splitter.split_documents(faq)
 
     # select which embeddings we want to use
